@@ -1,13 +1,40 @@
 class Sticker:
-    name = 0
+    name = ""
     price = 0
+    currency = "руб"
 
-
-class Weapon:
-    name = 0
-    price = 0
-    currency = ""
-    stickers = list[Sticker]
+    def __repr__(self):
+        return f"Название: {self.name}, Цена: {self.price}, Валюта цены: {self.currency}"
 
     def __str__(self):
-        return f"{self.name}, {self.price}, {self.currency}, {self.stickers}"
+        return f"Название: {self.name}, Цена: {self.price}, Валюта цены: {self.currency}"
+
+class Weapon:
+    name = ""
+    price = 0
+    currency = "руб"
+    stickers = []
+    id_ = ""
+
+    def __init__(self, name, price):
+        self.name = name,
+        self.price = price
+
+    def __str__(self):
+        return f"Название: {self.name}, Цена лота: {self.price}, Полная цена:{self.total}," \
+               f" Валюта цены: {self.currency}, Стикеры: {self.stickers}"
+    def __repr__(self):
+        return f"Название: {self.name}, Цена лота: {self.price}, Полная цена:{self.total}," \
+               f" Валюта цены: {self.currency}, Стикеры: {self.stickers}"
+
+    def add_sticker(self, sticker: Sticker):
+        self.stickers = [
+            sticker, *self.stickers
+        ]
+    @property
+    def total(self):
+        total = 0.00
+        for i in self.stickers:
+            total += i.price
+
+        return total + self.price

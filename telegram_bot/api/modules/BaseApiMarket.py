@@ -42,12 +42,15 @@ class BaseApiMarket:
         else:
             yield self.weapon_url
 
+
+
     async def send(self):
         async with aiohttp.ClientSession() as session:
             async with session.post(
                     url=next(self.get_weapon_api()),
+
             ) as response:
-                print(response.status)
+                print(response.status, await response.text(), response.headers)
                 if response.status != 200:
                     raise Exception
                 return await response.json()
