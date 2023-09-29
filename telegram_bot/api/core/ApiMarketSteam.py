@@ -20,13 +20,16 @@ class ApiMarketSteam(BaseApiMarket):
 
     parser = ParserApiMarket()
 
-    async def parser_weapon(self, data=None) -> list[BenefitWeapon]:
-        if data is None:
-            data = await self.send()
-        weapons_list = await self.parser.get_weapons_list(data=data)
-        benefit_class = BenefitWeapons(weapons_list=weapons_list)
-        benefit_weapons = benefit_class.get_benefit_weapons()
-        return benefit_weapons
+    async def parser_weapon(self) -> list[list[BenefitWeapon]]:
+        list_weapons = []
+        list_sending = [[await self.send(url), url] for url in self.get_weapon_api()]
+        for data in list_sending:
+            print(data[1])
+            weapons_list = await self.parser.get_weapons_list(data=data[0])
+            benefit_class = BenefitWeapons(weapons_list=weapons_list)
+            benefit_weapons = benefit_class.get_benefit_weapons()
+            list_weapons.append(benefit_weapons)
+        return list_weapons
 
 
 

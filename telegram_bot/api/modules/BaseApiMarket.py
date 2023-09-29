@@ -1,8 +1,9 @@
 from typing import List
 
 import aiohttp
-import requests
-from fp.fp import FreeProxy
+
+from services.excepted import TooManyRequests
+from services.weapon import proxy
 
 
 class BaseApiMarket:
@@ -41,13 +42,24 @@ class BaseApiMarket:
         else:
             yield self.weapon_url
 
-    async def send(self):
+    async def send(self, url):
         async with aiohttp.ClientSession() as session:
+            try:
+                proxy_str = next(proxy)
+            except StopIteration:
+                proxy.null_num()
+                proxy_str = next(proxy)
+            except Exception:
+                if proxy.count_null < 5:
+                    proxy.null_num()
+                    proxy_str = next(proxy)
+                else:
+                    raise TooManyRequests()
             async with session.post(
-                    url=next(self.get_weapon_api()),
-
+                    url=url,
+                    proxy=proxy_str
             ) as response:
-                print(response.status, await response.text(), response.headers)
+                print('send')
                 if response.status != 200:
-                    raise Exception
+                    return await self.send(url=url)
                 return await response.json()

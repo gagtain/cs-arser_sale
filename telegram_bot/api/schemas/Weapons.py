@@ -51,7 +51,6 @@ class BenefitWeapon:
     benefit: float = 0.0
     currency: str = "руб"
 
-
     def __init__(self, weapon, benefit):
         self.weapon = weapon
         self.benefit = benefit

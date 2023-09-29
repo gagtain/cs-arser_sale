@@ -1,4 +1,4 @@
-import os
+from functools import reduce
 
 from config import Config
 from api.schemas.Weapons import Weapon, BenefitWeapon, Sticker
@@ -11,14 +11,20 @@ class BenefitWeapons:
 
     def __init__(self, weapons_list):
         self.__weapons_list = weapons_list
+        self.__benefit_weapons_list = []
 
     def get_benefit_weapons(self):
+        min_price = self.get_min_price_weapon().price
         for weapon in self.__weapons_list:
             benefit = self.get_benefit_weapon(weapon)
-            if benefit > Config.Minimum_total_price:
+            is_price_min_benefit = benefit + min_price - weapon.price > Config.Minimum_total_price
+            if is_price_min_benefit:
                 benefit_weapon = BenefitWeapon(weapon=weapon, benefit=benefit)
                 self.__benefit_weapons_list.append(benefit_weapon)
         return self.__benefit_weapons_list
+
+    def get_min_price_weapon(self) -> Weapon:
+        return reduce(lambda x, y: x if x.price < y.price else y, self.__weapons_list)
 
     def get_benefit_weapon(self, weapon: Weapon):
         return self.get_sum_stickers_price(weapon)

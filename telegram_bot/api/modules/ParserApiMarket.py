@@ -27,6 +27,11 @@ class ParserApiMarket:
         soup = BeautifulSoup(data['results_html'], 'html.parser')
         listing_rows = soup.find_all('span', class_='market_listing_item_name')
         price_iter = self.get_weapons_price(results_html=data['results_html'])
+        listinginfo = list(data["listinginfo"].keys())
+        assets_down = data["assets"]["730"]
+        assets_down_down = list(assets_down.values())[0]
+        list_listing = list(assets_down_down.keys())
+
         for index, row in enumerate(listing_rows):
             price_result: str = next(price_iter)
             if price_result:
@@ -35,9 +40,8 @@ class ParserApiMarket:
                 weapon_price = None
             weapon = Weapon(name=row.text, price=float(weapon_price))
             weapon.name = weapon.name[0]
-            rowes = soup.find_all('div', class_="market_recent_listing_row")[index]
-            weapon.id_ = rowes['id']
-
+            weapon.id_ = listinginfo[index]
+            weapon.buy_url = f"buylisting|{weapon.id_}|730|{list(assets_down.keys())[0]}|{list_listing[index]}"
             await self.init_stickers(weapon=weapon, data=data, count=index)
             weapons_list.append(weapon)
         return weapons_list
@@ -49,15 +53,14 @@ class ParserApiMarket:
         if 'Sticker:' in stickers_list:
             regex = re.compile("\<br>Sticker: (.*)\</center></div>")
             stickers_str: str = regex.findall(stickers_list)
-            print(stickers_str)
             list_sticker_name = []
             if stickers_str:
-                # замена , на # внутри скобок для корректной работы
+                # замена ',' на '#' внутри скобок для корректной работы
                 res = re.sub(r'\(([^)]*)\)', lambda x: x.group(0).replace(',', '#'), stickers_str[0])
                 list_sticker_name = res.split(', ')
             for sticker in list_sticker_name:
                 sticker_class = Sticker()
-
+                print(sticker)
                 sticker_class.name = sticker.replace('#', ',')
                 price = await self.parser_sticker.get_min_price(sticker=sticker_class)
                 sticker_class.price = price
