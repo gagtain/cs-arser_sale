@@ -35,8 +35,9 @@ class ParserApiMarket:
                 weapon_price = None
             weapon = Weapon(name=row.text, price=float(weapon_price))
             weapon.name = weapon.name[0]
-            weapon.id_ = soup.find_all('div', class_="market_recent_listing_row")[index]['id']
-            print(weapon.id_)
+            rowes = soup.find_all('div', class_="market_recent_listing_row")[index]
+            weapon.id_ = rowes['id']
+
             await self.init_stickers(weapon=weapon, data=data, count=index)
             weapons_list.append(weapon)
         return weapons_list
@@ -48,16 +49,16 @@ class ParserApiMarket:
         if 'Sticker:' in stickers_list:
             regex = re.compile("\<br>Sticker: (.*)\</center></div>")
             stickers_str: str = regex.findall(stickers_list)
-
+            print(stickers_str)
             list_sticker_name = []
             if stickers_str:
-                if '|' in stickers_str:
-                    list_sticker_name = stickers_str[0].split(' | ')
-                else:
-                    list_sticker_name = stickers_str[0].split(', ')
+                # замена , на # внутри скобок для корректной работы
+                res = re.sub(r'\(([^)]*)\)', lambda x: x.group(0).replace(',', '#'), stickers_str[0])
+                list_sticker_name = res.split(', ')
             for sticker in list_sticker_name:
                 sticker_class = Sticker()
-                sticker_class.name = sticker
+
+                sticker_class.name = sticker.replace('#', ',')
                 price = await self.parser_sticker.get_min_price(sticker=sticker_class)
                 sticker_class.price = price
                 weapon.add_sticker(sticker_class)

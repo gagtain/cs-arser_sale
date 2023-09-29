@@ -5,7 +5,6 @@ import requests
 from fp.fp import FreeProxy
 
 
-
 class BaseApiMarket:
     api_url = "https://steamcommunity.com/market/listings/730/"
     start = 0
@@ -42,8 +41,6 @@ class BaseApiMarket:
         else:
             yield self.weapon_url
 
-
-
     async def send(self):
         async with aiohttp.ClientSession() as session:
             async with session.post(
@@ -54,4 +51,3 @@ class BaseApiMarket:
                 if response.status != 200:
                     raise Exception
                 return await response.json()
-
