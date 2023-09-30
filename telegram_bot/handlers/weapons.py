@@ -3,6 +3,7 @@ from aiogram.fsm.context import FSMContext
 
 from config import Config
 from forms.weapon import WeaponForm
+from services.sticker import clear_cache_sticker
 from services.weapon import add_weapon, remove_weapon, get_weapons
 
 router = Router()
@@ -10,15 +11,22 @@ router = Router()
 
 @router.message(F.text == 'Добавить оружие')
 async def echo_handler(message: types.Message, state: FSMContext) -> None:
-    if message.from_user == Config.user_id:
+    if message.from_user.id == Config.user_id:
         await state.set_state(WeaponForm.name_add)
 
         await message.answer(text="Напишите название скина")
 
 
+@router.message(F.text == 'Очистить кэш')
+async def echo_handler(message: types.Message, state: FSMContext) -> None:
+    if message.from_user.id == Config.user_id:
+        clear_cache_sticker()
+
+        await message.answer(text="Кэш очищен")
+
 @router.message(WeaponForm.name_add)
 async def echo_handler(message: types.Message, state: FSMContext) -> None:
-    if message.from_user == Config.user_id:
+    if message.from_user.id == Config.user_id:
         await state.clear()
         add_weapon(message.text)
         await message.answer(text="Скин добавлен")
@@ -26,7 +34,7 @@ async def echo_handler(message: types.Message, state: FSMContext) -> None:
 
 @router.message(F.text == 'Убрать оружие')
 async def echo_handler(message: types.Message, state: FSMContext) -> None:
-    if message.from_user == Config.user_id:
+    if message.from_user.id == Config.user_id:
         await state.set_state(WeaponForm.name_remove)
         text = get_weapons()
         await message.answer(text="Варианты\n" + "\n".join(text))

@@ -2,6 +2,7 @@ from typing import List
 
 import aiohttp
 
+from config import Config
 from services.excepted import TooManyRequests
 from services.weapon import proxy
 
@@ -9,7 +10,7 @@ from services.weapon import proxy
 class BaseApiMarket:
     api_url = "https://steamcommunity.com/market/listings/730/"
     start = 0
-    count = 100
+    count = 0
     country = "Ru"
     language = "english"
     currency = 5
@@ -24,6 +25,7 @@ class BaseApiMarket:
     weapon_url = None
 
     def __init__(self, weapon_data: str | List[str], many=False):
+        self.count = Config.count
         if not many:
             self.weapon_url = self.generate_api_url(weapon_data)
         else:
@@ -59,7 +61,6 @@ class BaseApiMarket:
                     url=url,
                     proxy=proxy_str
             ) as response:
-                print('send')
                 if response.status != 200:
                     return await self.send(url=url)
                 return await response.json()

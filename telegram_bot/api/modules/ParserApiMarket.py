@@ -60,7 +60,6 @@ class ParserApiMarket:
                 list_sticker_name = res.split(', ')
             for sticker in list_sticker_name:
                 sticker_class = Sticker()
-                print(sticker)
                 sticker_class.name = sticker.replace('#', ',')
                 price = await self.parser_sticker.get_min_price(sticker=sticker_class)
                 sticker_class.price = price

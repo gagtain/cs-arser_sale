@@ -13,9 +13,9 @@ from services.weapon import get_weapons
 router = Router()
 
 
-@router.message(F.text.in_(['/start']))
+@router.message(F.text.in_(['/get_weapons']))
 async def echo_handler(message: types.Message) -> None:
-    if message.from_user == Config.user_id:
+    if message.from_user.id == Config.user_id:
         try:
             weapon_data = get_weapons()
             if weapon_data[0] == '':
@@ -43,3 +43,9 @@ async def echo_handler(message: types.Message) -> None:
         except TooManyRequests:
             await message.answer(text="Не удалось отправить запрос из-за перегрузки запросами, проверьте прокси",
                                  reply_markup=main_keyboard)
+
+
+@router.message(F.text.in_(['/start']))
+async def echo_handler(message: types.Message) -> None:
+    if message.from_user.id == Config.user_id:
+        await message.answer(text="Ваш бот для поиска выгодных скинов", reply_markup=main_keyboard)

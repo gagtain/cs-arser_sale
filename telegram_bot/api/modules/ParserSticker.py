@@ -4,7 +4,7 @@ import aiohttp
 from bs4 import BeautifulSoup
 from api.schemas.Weapons import Sticker
 from local_info import get_sticker_data_json
-from config import Config
+from config import Config, init_config
 from services.excepted import TooManyRequests
 from services.weapon import proxy
 
@@ -15,11 +15,18 @@ class ParserSticker:
     }
     api_url_base = "https://steamcommunity.com/market/listings/730/Sticker | "
 
-    api_url = "https://steamcommunity.com/market/itemordershistogram?country=NL&language=russian&count=2" \
+    api_url = f"https://steamcommunity.com/market/itemordershistogram?country=NL&language=russian&count=100" \
               "&currency=5&two_factor=0"
+
 
     def get_api_url_base(self, sticker: Sticker):
         return f"{self.api_url_base}{sticker.name}"
+
+    def clear_cache(self):
+        self.sticker_cache = {
+
+        }
+
 
     def get_api_url(self, id):
         return f"{self.api_url}&item_nameid={id}"
@@ -42,7 +49,6 @@ class ParserSticker:
                     proxy=proxy_str
 
             ) as response:
-                print('send')
                 if response.status != 200:
                     return await self.send(url=url, text=text)
                 if text:
@@ -58,8 +64,6 @@ class ParserSticker:
         text = data['sell_order_summary']
         regex = re.compile("<br>Начальная цена: <span class=\"market_commodity_orders_header_promote\">(.*)<")
         min_price_sticker: str = regex.findall(text)
-        print('---------')
-        print(float(min_price_sticker[0][0: -5].replace(',', '.')))
         return float(min_price_sticker[0][0: -5].replace(',', '.'))
 
     async def get_data_sticker(self, sticker: Sticker):
