@@ -13,6 +13,7 @@ Stickers_price=10
 DEBUG=0
 telegram_token=""
 user_id=1
+count=100
 ~~~
 Minimum_total_price - минимальная прибыль со скина
 Stickers_price - процент от цены стикера в случае если этот стикер 1\
